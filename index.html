@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Xadrezinho Kids — 18 Desafios com Voz da Turma do Tabuleiro!</title>
+  <meta name="description" content="Jogue os 18 desafios interativos com voz do Xadrezinho Kids! O Pipo, a Tetê, o Bibo, o Caco, a Dadá e o Rei Ruru falam com a criança em cada jogada!" />
+  <style>
+    :root {
+      --ceu-topo: #7dd3fc;
+      --ceu-base: #e0f2fe;
+      --casa-clara: #f6e6be;
+      --casa-escura: #3e8e7e;
+      --moldura: #8c5c32;
+      --moldura-sombra: #684222;
+      --borda: #281e3c;
+      --azul-origem: #38bdf8;
+      --amarelo-trilha: #facc15;
+      --verde-destino: #22c55e;
+      --vermelho: #ef4444;
+      --roxo: #7c3aed;
+      --laranja: #f97316;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: 'Arial Rounded MT Bold', 'Trebuchet MS', 'Nunito', sans-serif;
+      background: linear-gradient(180deg, var(--ceu-topo) 0%, var(--ceu-base) 70%, #bbf7d0 100%);
+      min-height: 100vh;
+      color: var(--borda);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px 10px 36px;
+    }
+    .container {
+      width: 100%;
+      max-width: 500px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .topo {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #ffffff;
+      border: 4px solid var(--borda);
+      border-radius: 20px;
+      padding: 8px 12px;
+      box-shadow: 0 5px 0 var(--borda);
+    }
+    .marca {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .marca img {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+      background: #fef3c7;
+      border-radius: 50%;
+      border: 3px solid var(--borda);
+    }
+    .marca h1 {
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: #dc2626;
+      line-height: 1.05;
+    }
+    .marca span {
+      font-size: 0.76rem;
+      color: #475569;
+      font-weight: 800;
+    }
+    .btn-topo-kit {
+      background: #22c55e;
+      color: #fff;
+      text-decoration: none;
+      font-size: 0.78rem;
+      font-weight: 900;
+      padding: 7px 11px;
+      border-radius: 12px;
+      border: 3px solid var(--borda);
+      box-shadow: 0 3px 0 var(--borda);
+      white-space: nowrap;
+    }
+
+    /* Barra de 18 Fases rolável */
+    .fases-barra {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 4px 2px 6px;
+      scrollbar-width: none;
+    }
+    .fases-barra::-webkit-scrollbar { display: none; }
+    .pilula {
+      min-width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 3px solid var(--borda);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 0.85rem;
+      background: #ffffff;
+      color: #475569;
+      cursor: pointer;
+      box-shadow: 0 3px 0 var(--borda);
+      transition: all 0.2s ease;
+    }
+    .pilula.ativa {
+      background: var(--amarelo-trilha);
+      color: var(--borda);
+      transform: scale(1.12);
+    }
+    .pilula.feita {
+      background: var(--verde-destino);
+      color: #fff;
+    }
+
+    /* Balão do personagem com botão grande de ÁUDIO */
+    .balao-missao {
+      background: #ffffff;
+      border: 4px solid var(--borda);
+      border-radius: 22px;
+      padding: 10px 12px;
+      box-shadow: 0 5px 0 var(--borda);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .avatar-heroi {
+      width: 64px;
+      height: 64px;
+      flex-shrink: 0;
+      object-fit: contain;
+      filter: drop-shadow(0 3px 0 rgba(0,0,0,0.2));
+      animation: flutuar 2.2s ease-in-out infinite;
+      cursor: pointer;
+    }
+    @keyframes flutuar {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+    .avatar-heroi.falando {
+      animation: falarPulso 0.35s ease-in-out infinite alternate;
+    }
+    @keyframes falarPulso {
+      from { transform: scale(1) translateY(0); }
+      to { transform: scale(1.1) translateY(-4px); }
+    }
+    .texto-missao {
+      flex: 1;
+    }
+    .cabecalho-missao {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+    .texto-missao h2 {
+      font-size: 0.96rem;
+      font-weight: 900;
+      color: var(--roxo);
+    }
+    .btn-ouvir {
+      background: #38bdf8;
+      color: var(--borda);
+      border: 3px solid var(--borda);
+      border-radius: 999px;
+      padding: 4px 11px;
+      font-size: 0.8rem;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 3px 0 var(--borda);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+      animation: chamarAtencao 1.8s infinite;
+    }
+    @keyframes chamarAtencao {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.06); }
+    }
+    .texto-missao p {
+      font-size: 0.9rem;
+      font-weight: 700;
+      line-height: 1.28;
+      color: #1e293b;
+    }
+
+    /* Moldura do Tabuleiro com COORDENADAS NAS 4 BORDAS (Regra Pétrea) */
+    .moldura-tabuleiro {
+      background: var(--moldura);
+      border: 4px solid var(--borda);
+      border-radius: 22px;
+      padding: 6px;
+      box-shadow: 0 8px 0 var(--moldura-sombra), 0 11px 0 var(--borda);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      user-select: none;
+    }
+    .borda-letras {
+      display: grid;
+      grid-template-columns: 26px repeat(8, 1fr) 26px;
+      width: 100%;
+      height: 24px;
+      align-items: center;
+      justify-items: center;
+    }
+    .borda-letras span {
+      color: #ffffff;
+      font-weight: 900;
+      font-size: 0.9rem;
+      text-shadow: 0 2px 0 var(--borda);
+    }
+    .meio-tabuleiro {
+      display: grid;
+      grid-template-columns: 26px 1fr 26px;
+      width: 100%;
+      align-items: stretch;
+    }
+    .borda-numeros {
+      display: grid;
+      grid-template-rows: repeat(8, 1fr);
+      align-items: center;
+      justify-items: center;
+    }
+    .borda-numeros span {
+      color: #ffffff;
+      font-weight: 900;
+      font-size: 0.9rem;
+      text-shadow: 0 2px 0 var(--borda);
+    }
+    .tabuleiro {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      aspect-ratio: 1 / 1;
+      width: 100%;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 3px solid var(--borda);
+    }
+    .casa {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      aspect-ratio: 1 / 1;
+    }
+    .casa.clara { background: var(--casa-clara); }
+    .casa.escura { background: var(--casa-escura); }
+
+    .casa.origem::after {
+      content: '';
+      position: absolute;
+      inset: 4px;
+      border: 4px solid var(--azul-origem);
+      background: rgba(56, 189, 248, 0.34);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .casa.trilha::after {
+      content: '';
+      position: absolute;
+      inset: 7px;
+      border: 4px solid #ca8a04;
+      background: rgba(250, 204, 21, 0.72);
+      border-radius: 50%;
+      pointer-events: none;
+      animation: pulsar 0.8s ease infinite alternate;
+    }
+    .casa.destino::after {
+      content: '';
+      position: absolute;
+      inset: 3px;
+      border: 4px solid #15803d;
+      background: rgba(34, 197, 94, 0.68);
+      border-radius: 10px;
+      pointer-events: none;
+    }
+    @keyframes pulsar {
+      from { transform: scale(0.86); }
+      to { transform: scale(1.06); }
+    }
+
+    .peca-img {
+      width: 88%;
+      height: 88%;
+      object-fit: contain;
+      z-index: 3;
+      pointer-events: none;
+      filter: drop-shadow(0 2px 2px rgba(0,0,0,0.35));
+    }
+    .estrela-alvo {
+      font-size: 1.65rem;
+      z-index: 4;
+      filter: drop-shadow(0 2px 3px rgba(0,0,0,0.5));
+      animation: girarEstrela 1.4s ease-in-out infinite alternate;
+    }
+    @keyframes girarEstrela {
+      from { transform: scale(0.92) rotate(-8deg); }
+      to { transform: scale(1.14) rotate(8deg); }
+    }
+
+    .feedback-barra {
+      min-height: 54px;
+      background: #ffffff;
+      border: 4px solid var(--borda);
+      border-radius: 18px;
+      padding: 9px 13px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      box-shadow: 0 4px 0 var(--borda);
+      font-weight: 800;
+      font-size: 0.92rem;
+    }
+    .feedback-barra.acerto {
+      background: #dcfce7;
+      border-color: #15803d;
+      color: #14532d;
+    }
+    .feedback-barra.erro {
+      background: #fee2e2;
+      border-color: #b91c1c;
+      color: #7f1d1d;
+    }
+    .btn-acao {
+      background: var(--laranja);
+      color: #fff;
+      border: 3px solid var(--borda);
+      border-radius: 14px;
+      padding: 8px 15px;
+      font-size: 0.95rem;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 3px 0 var(--borda);
+      white-space: nowrap;
+    }
+
+    /* Overlay inicial para liberar som no iPhone/Android com 1 toque */
+    .overlay-som {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.78);
+      z-index: 99;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .card-som {
+      background: #ffffff;
+      border: 5px solid var(--borda);
+      border-radius: 28px;
+      padding: 24px 20px;
+      max-width: 390px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 10px 0 var(--borda);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+    .card-som img {
+      width: 105px;
+      height: 105px;
+      object-fit: contain;
+    }
+    .card-som h2 {
+      font-size: 1.45rem;
+      color: var(--roxo);
+      font-weight: 900;
+    }
+    .card-som p {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #334155;
+    }
+    .btn-comecar-som {
+      background: #22c55e;
+      color: #fff;
+      border: 4px solid var(--borda);
+      border-radius: 18px;
+      padding: 14px 24px;
+      font-size: 1.2rem;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 6px 0 var(--borda);
+      width: 100%;
+    }
+
+    /* Rodapé fixo para os pais (Amostra Grátis + Caderno Completo Pix + Livro Físico) */
+    .banner-pais {
+      background: #ffffff;
+      border: 4px solid var(--borda);
+      border-radius: 20px;
+      padding: 12px 14px;
+      box-shadow: 0 5px 0 var(--borda);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .banner-pais h3 {
+      font-size: 0.95rem;
+      color: #0369a1;
+      font-weight: 900;
+    }
+    .botoes-pais {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .btn-pai {
+      text-align: center;
+      text-decoration: none;
+      padding: 10px 8px;
+      border-radius: 14px;
+      border: 3px solid var(--borda);
+      font-weight: 900;
+      font-size: 0.84rem;
+      box-shadow: 0 3px 0 var(--borda);
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .btn-pai-destaque {
+      grid-column: 1 / -1;
+      background: linear-gradient(90deg, #7c3aed 0%, #6d28d9 100%);
+      color: #fff;
+      font-size: 0.92rem;
+      padding: 12px 10px;
+    }
+    .btn-verde { background: #22c55e; color: #fff; }
+    .btn-amarelo { background: #facc15; color: var(--borda); }
+
+    /* Modal do Kit Completo 24 páginas via Pix */
+    .modal-pix {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.82);
+      z-index: 120;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+    }
+    .card-pix {
+      background: #ffffff;
+      border: 5px solid var(--borda);
+      border-radius: 26px;
+      padding: 18px 16px;
+      max-width: 420px;
+      width: 100%;
+      box-shadow: 0 10px 0 var(--borda);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 92vh;
+      overflow-y: auto;
+    }
+    .card-pix-topo {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .card-pix-topo h2 {
+      font-size: 1.18rem;
+      color: var(--roxo);
+      font-weight: 900;
+    }
+    .btn-fechar-pix {
+      background: #f1f5f9;
+      border: 3px solid var(--borda);
+      border-radius: 10px;
+      font-weight: 900;
+      padding: 4px 10px;
+      cursor: pointer;
+    }
+    .lista-beneficios {
+      background: #f8fafc;
+      border: 3px solid #cbd5e1;
+      border-radius: 14px;
+      padding: 10px 12px;
+      font-size: 0.84rem;
+      font-weight: 800;
+      color: #334155;
+      line-height: 1.45;
+    }
+    .qr-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      background: #fefce8;
+      border: 3px dashed #ca8a04;
+      border-radius: 16px;
+      padding: 12px;
+      text-align: center;
+    }
+    .qr-box img {
+      width: 180px;
+      height: 180px;
+      border: 3px solid var(--borda);
+      border-radius: 12px;
+      background: #fff;
+    }
+    .pix-codigo-input {
+      width: 100%;
+      font-size: 0.75rem;
+      padding: 8px;
+      border: 2px solid #94a3b8;
+      border-radius: 10px;
+      background: #fff;
+      color: #334155;
+      font-family: monospace;
+    }
+    .status-pix {
+      font-size: 0.85rem;
+      font-weight: 900;
+      text-align: center;
+      padding: 8px;
+      border-radius: 12px;
+      background: #e0f2fe;
+      color: #0369a1;
+    }
+    .status-pix.pago {
+      background: #dcfce7;
+      color: #15803d;
+    }
+  </style>
+</head>
+<body>
+  <!-- Modal 1 toque para ativar a voz dos personagens no celular -->
+  <div class="overlay-som" id="overlay-som">
+    <div class="card-som">
+      <img src="img/pipo.png" alt="Pipo" />
+      <h2>Vem Jogar com a Turma!</h2>
+      <p>São <strong>18 Desafios com Voz</strong>! Os personagens falam com a criança em cada jogada!</p>
+      <button class="btn-comecar-som" onclick="iniciarComSom()">
+        🔊 COMEÇAR COM SOM!
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal Kit Completo 24 Páginas via Pix -->
+  <div class="modal-pix" id="modal-kit-completo">
+    <div class="card-pix">
+      <div class="card-pix-topo">
+        <h2>⭐ Caderno Completo (24 Págs)</h2>
+        <button class="btn-fechar-pix" onclick="fecharModalKitCompleto()">✕</button>
+      </div>
+      <div class="lista-beneficios">
+        ✅ <strong>18 Missões Visuais Completas</strong> (Temporadas 1 e 2)<br/>
+        ✅ <strong>Peças da Turma para Recortar</strong> e montar em casa<br/>
+        ✅ <strong>Gabarito Comentado</strong> para os pais + <strong>Certificado Oficial</strong><br/>
+        ✅ Liberação automática na tela após o Pix de <strong>R$ 19,90</strong>!
+      </div>
+      <div class="qr-box" id="area-pagamento-pix">
+        <div style="font-weight:900;color:#1e293b;font-size:0.95rem;">Escaneie o QR Code ou use o Pix Copia e Cola:</div>
+        <img id="img-qr-pix" src="" alt="QR Code Pix R$ 19,90" style="display:none;" />
+        <input id="input-brcode-pix" class="pix-codigo-input" type="text" readonly value="Gerando código Pix exclusivo..." />
+        <button class="btn-pai btn-verde" style="width:100%;font-size:0.95rem;" onclick="copiarCodigoPix()">
+          📋 Copiar Código Pix (R$ 19,90)
+        </button>
+      </div>
+      <div class="status-pix" id="status-pedido-pix">
+        ⏳ Aguardando confirmação automática do banco...
+      </div>
+      <button class="btn-pai btn-amarelo" id="btn-verificar-pix" onclick="verificarPedidoPixAgora()">
+        🔄 Já paguei — Verificar agora
+      </button>
+      <a id="btn-download-completo" href="#" target="_blank" class="btn-pai btn-verde" style="display:none;font-size:1rem;padding:14px;">
+        📥 BAIXAR CADERNO COMPLETO (24 PÁGS)
+      </a>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Cabeçalho -->
+    <div class="topo">
+      <div class="marca">
+        <img src="img/pipo.png" alt="Pipo" />
+        <div>
+          <h1>XADREZINHO KIDS</h1>
+          <span>18 Fases Faladas • Temporadas 1 e 2</span>
+        </div>
+      </div>
+      <a href="kit-digital/Amostra-Gratis-Xadrezinho-Kids.pdf" target="_blank" class="btn-topo-kit" onclick="registrarEvento('baixou_amostra_pdf')">
+        🎁 Amostra Grátis
+      </a>
+    </div>
+
+    <!-- Seletor das 18 Fases -->
+    <div class="fases-barra" id="fases-barra"></div>
+
+    <!-- Balão do Personagem + Botão Ouvir -->
+    <div class="balao-missao">
+      <img id="img-heroi" class="avatar-heroi" src="img/pipo.png" alt="Personagem" onclick="ouvirPergunta()" />
+      <div class="texto-missao">
+        <div class="cabecalho-missao">
+          <h2 id="titulo-missao">Fase 1 de 18</h2>
+          <button class="btn-ouvir" onclick="ouvirPergunta()">🔊 Ouvir</button>
+        </div>
+        <p id="desc-missao"></p>
+      </div>
+    </div>
+
+    <!-- Tabuleiro com Letras (a..h) em cima/embaixo e Números (1..8) na esquerda/direita -->
+    <div class="moldura-tabuleiro">
+      <div class="borda-letras">
+        <span></span><span>a</span><span>b</span><span>c</span><span>d</span><span>e</span><span>f</span><span>g</span><span>h</span><span></span>
+      </div>
+      <div class="meio-tabuleiro">
+        <div class="borda-numeros">
+          <span>8</span><span>7</span><span>6</span><span>5</span><span>4</span><span>3</span><span>2</span><span>1</span>
+        </div>
+        <div class="tabuleiro" id="tabuleiro"></div>
+        <div class="borda-numeros">
+          <span>8</span><span>7</span><span>6</span><span>5</span><span>4</span><span>3</span><span>2</span><span>1</span>
+        </div>
+      </div>
+      <div class="borda-letras">
+        <span></span><span>a</span><span>b</span><span>c</span><span>d</span><span>e</span><span>f</span><span>g</span><span>h</span><span></span>
+      </div>
+    </div>
+
+    <!-- Barra de Resposta -->
+    <div class="feedback-barra" id="barra-feedback">
+      <span id="texto-feedback">👆 Toque na estrela certa no tabuleiro!</span>
+      <button class="btn-acao" id="btn-proximo" style="display:none;" onclick="proximoDesafio()">Próxima Fase ➔</button>
+    </div>
+
+    <!-- Caixa Permanente para os Pais -->
+    <div class="banner-pais">
+      <h3>👨‍👩‍👧 Para os Pais: Aprendizado fora da tela!</h3>
+      <div class="botoes-pais">
+        <button type="button" class="btn-pai btn-pai-destaque" onclick="abrirModalKitCompleto()">
+          ⭐ Caderno Completo PDF (24 págs • R$ 19,90 Pix)
+        </button>
+        <a href="kit-digital/Amostra-Gratis-Xadrezinho-Kids.pdf" target="_blank" class="btn-pai btn-verde" onclick="registrarEvento('baixou_amostra_pdf')">
+          🎁 Amostra Grátis (4 págs)
+        </a>
+        <a href="https://loja.uiclap.com/titulo/ua221292/" target="_blank" class="btn-pai btn-amarelo" onclick="registrarEvento('clicou_livro_fisico_uiclap')">
+          📚 Livro Físico (UICLAP)
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://sjtfwipgqeryeukreyst.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqdGZ3aXBncWVyeWV1a3JleXN0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxNTI1MTksImV4cCI6MjA5MjcyODUxOX0.DG0pLGoPbo8W50_AeXb1zA0BALCchyKPAGFfP3hghcM';
+
+    function obterSessaoId() {
+      try {
+        let sid = localStorage.getItem('xk_sessao_id');
+        if (!sid || sid.length < 8) {
+          sid = 'xk_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 10);
+          localStorage.setItem('xk_sessao_id', sid);
+        }
+        return sid;
+      } catch (e) {
+        return 'xk_anon_' + Math.random().toString(36).slice(2, 10);
+      }
+    }
+
+    async function chamarRpc(nome, params) {
+      const resp = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${nome}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+        },
+        body: JSON.stringify(params)
+      });
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      return await resp.json();
+    }
+
+    function registrarEvento(evento, fase = null) {
+      chamarRpc('registrar_evento_xadrezinho', {
+        p_sessao_id: obterSessaoId(),
+        p_evento: evento,
+        p_fase: fase
+      }).catch(() => {});
+    }
+
+    let pedidoAtualTxid = null;
+    let timerConsultaPix = null;
+
+    async function abrirModalKitCompleto() {
+      document.getElementById('modal-kit-completo').style.display = 'flex';
+      const stEl = document.getElementById('status-pedido-pix');
+      const inpEl = document.getElementById('input-brcode-pix');
+      const qrEl = document.getElementById('img-qr-pix');
+      const dlEl = document.getElementById('btn-download-completo');
+
+      try {
+        const salvo = localStorage.getItem('xk_txid_pendente');
+        if (salvo) {
+          const check = await chamarRpc('consultar_pedido_xadrezinho', { p_txid: salvo });
+          if (check && check.encontrado && check.status === 'pago' && check.url_download) {
+            mostrarDownloadLiberado(check.url_download);
+            return;
+          }
+        }
+      } catch (e) {}
+
+      if (!pedidoAtualTxid) {
+        stEl.className = 'status-pix';
+        stEl.textContent = '⏳ Gerando QR Code Pix exclusivo...';
+        try {
+          const res = await chamarRpc('criar_pedido_xadrezinho', { p_sessao_id: obterSessaoId() });
+          pedidoAtualTxid = res.txid;
+          try { localStorage.setItem('xk_txid_pendente', res.txid); } catch (e) {}
+          inpEl.value = res.pix_copia_e_cola;
+          qrEl.src = 'https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=' + encodeURIComponent(res.pix_copia_e_cola);
+          qrEl.style.display = 'block';
+          stEl.textContent = '⏳ Aguardando pagamento Pix (liberação automática em segundos)...';
+          dlEl.style.display = 'none';
+        } catch (e) {
+          stEl.textContent = '⚠️ Erro de conexão ao gerar o Pix. Toque novamente.';
+          return;
+        }
+      }
+
+      if (timerConsultaPix) clearInterval(timerConsultaPix);
+      timerConsultaPix = setInterval(verificarPedidoPixAgora, 4000);
+    }
+
+    function fecharModalKitCompleto() {
+      document.getElementById('modal-kit-completo').style.display = 'none';
+      if (timerConsultaPix) {
+        clearInterval(timerConsultaPix);
+        timerConsultaPix = null;
+      }
+    }
+
+    function copiarCodigoPix() {
+      const inp = document.getElementById('input-brcode-pix');
+      if (!inp || !inp.value || inp.value.startsWith('Gerando')) return;
+      registrarEvento('copiou_pix_kit_completo');
+      navigator.clipboard.writeText(inp.value).then(() => {
+        document.getElementById('status-pedido-pix').textContent = '✅ Código Pix copiado! Pague no app do seu banco e aguarde aqui.';
+      }).catch(() => {
+        inp.select();
+        document.execCommand('copy');
+        document.getElementById('status-pedido-pix').textContent = '✅ Código Pix copiado! Pague no app do seu banco e aguarde aqui.';
+      });
+    }
+
+    function mostrarDownloadLiberado(urlDownload) {
+      if (timerConsultaPix) {
+        clearInterval(timerConsultaPix);
+        timerConsultaPix = null;
+      }
+      document.getElementById('area-pagamento-pix').style.display = 'none';
+      document.getElementById('btn-verificar-pix').style.display = 'none';
+      const stEl = document.getElementById('status-pedido-pix');
+      stEl.className = 'status-pix pago';
+      stEl.textContent = '🎉 Pagamento confirmado! Seu Caderno Completo de 24 páginas está liberado:';
+      const dlEl = document.getElementById('btn-download-completo');
+      dlEl.href = urlDownload;
+      dlEl.style.display = 'block';
+    }
+
+    async function verificarPedidoPixAgora() {
+      const txid = pedidoAtualTxid || (function() { try { return localStorage.getItem('xk_txid_pendente'); } catch(e) { return null; } })();
+      if (!txid) return;
+      try {
+        const res = await chamarRpc('consultar_pedido_xadrezinho', { p_txid: txid });
+        if (res && res.encontrado && res.status === 'pago' && res.url_download) {
+          mostrarDownloadLiberado(res.url_download);
+        }
+      } catch (e) {}
+    }
+    const DESAFIOS = [
+      {
+        num: 1, heroi: "pipo", titulo: "Fase 1 — O Segredo do Tabuleiro",
+        pergunta: "A casinha clara fica sempre no cantinho da direita! Toque na estrela do cantinho direito embaixo (h1)!",
+        origem: "h1", pecas: [{nome:"pipo",casa:"e2"},{nome:"dudu",casa:"e7"}],
+        estrelas: [
+          {casa:"h1", cor:"⭐", certa:true, trilha:[]},
+          {casa:"a1", cor:"🔵", certa:false},
+          {casa:"a8", cor:"🌸", certa:false}
+        ],
+        sucesso: "Clarinha na direita (h1), tá certinho!"
+      },
+      {
+        num: 2, heroi: "tete", titulo: "Fase 2 — A Reta da Torre Tetê",
+        pergunta: "A Torre Tetê só anda reto e não pula ninguém! Qual estrela ela pega numa reta só?",
+        origem: "d2", pecas: [{nome:"tete",casa:"d2"},{nome:"pipo",casa:"b2"}],
+        estrelas: [
+          {casa:"d7", cor:"⭐", certa:true, trilha:["d3","d4","d5","d6"]},
+          {casa:"a2", cor:"🔵", certa:false},
+          {casa:"g5", cor:"🌸", certa:false}
+        ],
+        sucesso: "Boa! De d2 até d7 numa reta só!"
+      },
+      {
+        num: 3, heroi: "bibo", titulo: "Fase 3 — A Diagonal do Bispo Bibo",
+        pergunta: "O Bispo Bibo só anda de ladinho (na diagonal), sempre na mesma cor! Qual estrela está na diagonal dele?",
+        origem: "c1", pecas: [{nome:"bibo",casa:"c1"},{nome:"pipo",casa:"c4"}],
+        estrelas: [
+          {casa:"g5", cor:"⭐", certa:true, trilha:["d2","e3","f4"]},
+          {casa:"c6", cor:"🔵", certa:false},
+          {casa:"f5", cor:"🌸", certa:false}
+        ],
+        sucesso: "De ladinho! De c1 até g5 na diagonal!"
+      },
+      {
+        num: 4, heroi: "dada", titulo: "Fase 4 — O Poder da Dama Dadá",
+        pergunta: "A Dama Dadá anda reto e na diagonal! Toque na estrela lá no alto que está na diagonal dela!",
+        origem: "d4", pecas: [{nome:"dada",casa:"d4"}],
+        estrelas: [
+          {casa:"h8", cor:"⭐", certa:true, trilha:["e5","f6","g7"]},
+          {casa:"f5", cor:"🔵", certa:false},
+          {casa:"b5", cor:"🌸", certa:false}
+        ],
+        sucesso: "Maravilha! A Dama foi longe até h8!"
+      },
+      {
+        num: 5, heroi: "ruru", titulo: "Fase 5 — Um Passinho do Rei Ruru",
+        pergunta: "O Vovô Rei Ruru anda só um passinho por vez! Qual estrela está coladinha nele?",
+        origem: "e2", pecas: [{nome:"ruru",casa:"e2"}],
+        estrelas: [
+          {casa:"f3", cor:"⭐", certa:true, trilha:[]},
+          {casa:"e5", cor:"🔵", certa:false},
+          {casa:"b6", cor:"🌸", certa:false}
+        ],
+        sucesso: "Muito bem! Um passinho até f3!"
+      },
+      {
+        num: 6, heroi: "caco", titulo: "Fase 6 — O Pulo em L do Cavalo Caco",
+        pergunta: "Pocotó! O Caco pula por cima fazendo um L (2 pra frente e 1 pro lado)! Onde ele pousa?",
+        origem: "d4", pecas: [{nome:"caco",casa:"d4"},{nome:"dudu",casa:"d5"}],
+        estrelas: [
+          {casa:"e6", cor:"⭐", certa:true, trilha:["d5","d6"]},
+          {casa:"d7", cor:"🔵", certa:false},
+          {casa:"g7", cor:"🌸", certa:false}
+        ],
+        sucesso: "Pocotó! Pulou em L até a casa e6!"
+      },
+      {
+        num: 7, heroi: "pipo", titulo: "Fase 7 — O Passo do Peão Pipo",
+        pergunta: "O Pipo já saiu da largada e anda 1 passinho pra frente! Para qual estrela ele vai?",
+        origem: "e3", pecas: [{nome:"pipo",casa:"e3"}],
+        estrelas: [
+          {casa:"e4", cor:"⭐", certa:true, trilha:[]},
+          {casa:"e5", cor:"🔵", certa:false},
+          {casa:"f3", cor:"🌸", certa:false}
+        ],
+        sucesso: "Pra frente, sempre! Avançou para e4!"
+      },
+      {
+        num: 8, heroi: "pipo", titulo: "Fase 8 — Nhac! Captura na Diagonal",
+        pergunta: "O Peão captura 1 passinho na diagonal! Qual estrela o Pipo consegue capturar?",
+        origem: "d4", pecas: [{nome:"pipo",casa:"d4"},{nome:"dudu",casa:"d5"}],
+        estrelas: [
+          {casa:"e5", cor:"⭐", certa:true, trilha:[]},
+          {casa:"d5", cor:"🔵", certa:false},
+          {casa:"d3", cor:"🌸", certa:false}
+        ],
+        sucesso: "Nhac! Capturou na diagonal em e5!"
+      },
+      {
+        num: 9, heroi: "dada", titulo: "Fase 9 — Promoção na Última Fileira!",
+        pergunta: "O Pipo está em e7! Toque na última fileira (e8) para ele virar a Dama Dadá!",
+        origem: "e7", pecas: [{nome:"pipo",casa:"e7"},{nome:"ruru",casa:"g1"},{nome:"tonhao",casa:"b8"}],
+        estrelas: [
+          {casa:"e8", cor:"⭐", certa:true, trilha:[]},
+          {casa:"f7", cor:"🔵", certa:false},
+          {casa:"e6", cor:"🌸", certa:false}
+        ],
+        sucesso: "Promoção! O Peão virou Dama em e8!"
+      },
+      {
+        num: 10, heroi: "tete", titulo: "Fase 10 — Salve o Rei do Xeque!",
+        pergunta: "O Rei Ruru em e1 está em xeque! Leve a Tetê (c3) para o meio do caminho (e3) para proteger o Rei!",
+        origem: "c3", pecas: [{nome:"ruru",casa:"e1"},{nome:"tete",casa:"c3"},{nome:"dudu",casa:"e8"}],
+        estrelas: [
+          {casa:"e3", cor:"⭐", certa:true, trilha:["d3"]},
+          {casa:"a3", cor:"🔵", certa:false},
+          {casa:"c7", cor:"🌸", certa:false}
+        ],
+        sucesso: "Herói! A Tetê tapou o ataque em e3!"
+      },
+      {
+        num: 11, heroi: "tete", titulo: "Fase 11 — Mate do Corredor!",
+        pergunta: "O Rei Tonhão está preso na fileira 8! Suba com a Tetê até a8 para dar Xeque-Mate!",
+        origem: "a1", pecas: [{nome:"tete",casa:"a1"},{nome:"ruru",casa:"g1"},{nome:"tonhao",casa:"g8"},{nome:"dudu",casa:"f7"},{nome:"dudu",casa:"g7"},{nome:"dudu",casa:"h7"}],
+        estrelas: [
+          {casa:"a8", cor:"⭐", certa:true, trilha:["a2","a3","a4","a5","a6","a7"]},
+          {casa:"a4", cor:"🔵", certa:false},
+          {casa:"d1", cor:"🌸", certa:false}
+        ],
+        sucesso: "Xeque-Mate no corredor na fileira 8!"
+      },
+      {
+        num: 12, heroi: "ruru", titulo: "Fase 12 — O Roque do Rei e da Torre!",
+        pergunta: "No Roque Pequeno, o Rei Ruru dá 2 passos para a direita rumo à Torre! Onde ele para?",
+        origem: "e1", pecas: [{nome:"ruru",casa:"e1"},{nome:"tete",casa:"h1"}],
+        estrelas: [
+          {casa:"g1", cor:"⭐", certa:true, trilha:["f1"]},
+          {casa:"d1", cor:"🔵", certa:false},
+          {casa:"e3", cor:"🌸", certa:false}
+        ],
+        sucesso: "Roque perfeito! Rei seguro em g1!"
+      },
+      {
+        num: 13, heroi: "pipo", titulo: "Fase 13 — Captura Especial En Passant!",
+        pergunta: "O Dudu pulou 2 casas e parou em d5 ao lado do Pipo! Toque na diagonal d6 para capturar de passagem!",
+        origem: "e5", pecas: [{nome:"pipo",casa:"e5"},{nome:"dudu",casa:"d5"}],
+        estrelas: [
+          {casa:"d6", cor:"⭐", certa:true, trilha:[]},
+          {casa:"e6", cor:"🔵", certa:false},
+          {casa:"f6", cor:"🌸", certa:false}
+        ],
+        sucesso: "En Passant! Captura de passagem em d6!"
+      },
+      {
+        num: 14, heroi: "dada", titulo: "Fase 14 — O Mate do Pastorzinho!",
+        pergunta: "O Bispo Bibo protege a casa f7! Leve a Dama Dadá até f7 para dar o Xeque-Mate!",
+        origem: "f3", pecas: [{nome:"dada",casa:"f3"},{nome:"bibo",casa:"c4"},{nome:"tonhao",casa:"e8"},{nome:"dudu",casa:"d7"},{nome:"dudu",casa:"e7"}],
+        estrelas: [
+          {casa:"f7", cor:"⭐", certa:true, trilha:["f4","f5","f6"]},
+          {casa:"a3", cor:"🔵", certa:false},
+          {casa:"h5", cor:"🌸", certa:false}
+        ],
+        sucesso: "Xeque-Mate do Pastorzinho em f7!"
+      },
+      {
+        num: 15, heroi: "faisca", titulo: "Fase 15 — Defesa do Pastorzinho!",
+        pergunta: "A Dama em h5 quer atacar f7! Toque na estrela em g6 para o peão fechar a diagonal dela!",
+        origem: "g7", pecas: [{nome:"dada",casa:"h5"},{nome:"bibo",casa:"c4"},{nome:"tonhao",casa:"e8"},{nome:"dudu",casa:"g7"},{nome:"faisca",casa:"b8"}],
+        estrelas: [
+          {casa:"g6", cor:"⭐", certa:true, trilha:[]},
+          {casa:"a6", cor:"🔵", certa:false},
+          {casa:"c6", cor:"🌸", certa:false}
+        ],
+        sucesso: "Boa defesa! Peão em g6 bloqueou a Dama!"
+      },
+      {
+        num: 16, heroi: "dada", titulo: "Fase 16 — Xeque-Mate sem Afogar!",
+        pergunta: "Cuidado com o empate! Leve a Dama Dadá até d8 na fileira 8 para dar Xeque-Mate de verdade!",
+        origem: "d7", pecas: [{nome:"tonhao",casa:"a8"},{nome:"ruru",casa:"b6"},{nome:"dada",casa:"d7"}],
+        estrelas: [
+          {casa:"d8", cor:"⭐", certa:true, trilha:[]},
+          {casa:"c6", cor:"🔵", certa:false},
+          {casa:"h7", cor:"🌸", certa:false}
+        ],
+        sucesso: "Isso! Xeque-Mate em d8 sem afogar o Rei!"
+      },
+      {
+        num: 17, heroi: "caco", titulo: "Fase 17 — O Garfo do Cavalo Caco!",
+        pergunta: "Em qual estrela o Cavalo Caco pula em L para atacar o Rei (e8) e a Torre (a8) juntos?",
+        origem: "d5", pecas: [{nome:"caco",casa:"d5"},{nome:"tonhao",casa:"e8"},{nome:"dudu",casa:"a8"}],
+        estrelas: [
+          {casa:"c7", cor:"⭐", certa:true, trilha:["d6","d7"]},
+          {casa:"b6", cor:"🔵", certa:false},
+          {casa:"f6", cor:"🌸", certa:false}
+        ],
+        sucesso: "Garfo Real em c7! Atacou Rei e Torre!"
+      },
+      {
+        num: 18, heroi: "dada", titulo: "Fase 18 — O Mate da Escadinha!",
+        pergunta: "A Tetê já cortou a fileira 7! Suba com a Dama Dadá até b8 na fileira 8 para fechar a Escadinha!",
+        origem: "b6", pecas: [{nome:"tete",casa:"a7"},{nome:"dada",casa:"b6"},{nome:"tonhao",casa:"e8"}],
+        estrelas: [
+          {casa:"b8", cor:"⭐", certa:true, trilha:["b7"]},
+          {casa:"h6", cor:"🔵", certa:false},
+          {casa:"b2", cor:"🌸", certa:false}
+        ],
+        sucesso: "CAMPEÃO! Você completou todas as 18 Fases!"
+      }
+    ];
+
+    let idxAtual = 0;
+    let resolvido = false;
+    let trilhaAtiva = [];
+    let destinoAtivo = null;
+    let pecaMovida = false;
+    let feitas = new Set();
+    let audioAtual = null;
+
+    function tocarVoz(num, tipo) {
+      try {
+        if (audioAtual) {
+          audioAtual.pause();
+          audioAtual.currentTime = 0;
+        }
+        const nStr = String(num).padStart(2, '0');
+        const imgHeroi = document.getElementById('img-heroi');
+        audioAtual = new Audio(`audio/d${nStr}_${tipo}.mp3`);
+        imgHeroi.classList.add('falando');
+        audioAtual.onended = () => imgHeroi.classList.remove('falando');
+        audioAtual.onerror = () => imgHeroi.classList.remove('falando');
+        audioAtual.play().catch(() => imgHeroi.classList.remove('falando'));
+      } catch (e) {}
+    }
+
+    function iniciarComSom() {
+      document.getElementById('overlay-som').style.display = 'none';
+      registrarEvento('iniciou_som');
+      ouvirPergunta();
+    }
+
+    function ouvirPergunta() {
+      const d = DESAFIOS[idxAtual];
+      tocarVoz(d.num, 'pergunta');
+    }
+
+    function irParaFase(i) {
+      idxAtual = i;
+      resolvido = false;
+      trilhaAtiva = [];
+      destinoAtivo = null;
+      pecaMovida = false;
+      const barra = document.getElementById('barra-feedback');
+      barra.className = 'feedback-barra';
+      document.getElementById('texto-feedback').textContent = '👆 Toque na estrela certa no tabuleiro!';
+      document.getElementById('btn-proximo').style.display = 'none';
+      renderizarDesafio();
+      ouvirPergunta();
+    }
+
+    function renderizarBarraFases() {
+      const barra = document.getElementById('fases-barra');
+      barra.innerHTML = '';
+      DESAFIOS.forEach((d, i) => {
+        const b = document.createElement('div');
+        b.className = 'pilula' + (feitas.has(i) ? ' feita' : '') + (i === idxAtual ? ' ativa' : '');
+        b.textContent = feitas.has(i) ? '✓' : d.num;
+        b.onclick = () => irParaFase(i);
+        barra.appendChild(b);
+      });
+    }
+
+    function renderizarDesafio() {
+      const d = DESAFIOS[idxAtual];
+      document.getElementById('img-heroi').src = `img/${d.heroi}.png`;
+      document.getElementById('titulo-missao').textContent = d.titulo;
+      document.getElementById('desc-missao').textContent = d.pergunta;
+      renderizarBarraFases();
+
+      const tab = document.getElementById('tabuleiro');
+      tab.innerHTML = '';
+      const cols = ['a','b','c','d','e','f','g','h'];
+
+      for (let r = 8; r >= 1; r--) {
+        for (let c = 0; c < 8; c++) {
+          const coord = cols[c] + r;
+          const ehClara = ((c + (r - 1)) % 2 === 1);
+          const div = document.createElement('div');
+          div.className = `casa ${ehClara ? 'clara' : 'escura'}`;
+
+          if (coord === d.origem) div.classList.add('origem');
+          if (trilhaAtiva.includes(coord)) div.classList.add('trilha');
+          if (destinoAtivo === coord) div.classList.add('destino');
+
+          let nomePeca = null;
+          if (pecaMovida && coord === destinoAtivo) {
+            nomePeca = d.heroi;
+          } else {
+            for (const p of d.pecas) {
+              if (p.casa === coord) {
+                if (pecaMovida && p.casa === d.origem) continue;
+                nomePeca = p.nome;
+              }
+            }
+          }
+
+          const est = d.estrelas.find(e => e.casa === coord);
+          if (est && (!pecaMovida || coord !== destinoAtivo)) {
+            const spEst = document.createElement('span');
+            spEst.className = 'estrela-alvo';
+            spEst.textContent = est.cor;
+            div.appendChild(spEst);
+          }
+
+          if (nomePeca) {
+            const img = document.createElement('img');
+            img.className = 'peca-img';
+            img.src = `img/${nomePeca}.png`;
+            img.alt = nomePeca;
+            div.appendChild(img);
+          }
+
+          div.onclick = () => clicarCasa(coord);
+          tab.appendChild(div);
+        }
+      }
+    }
+
+    function clicarCasa(coord) {
+      if (resolvido) return;
+      const d = DESAFIOS[idxAtual];
+      const barra = document.getElementById('barra-feedback');
+      const txt = document.getElementById('texto-feedback');
+      const btn = document.getElementById('btn-proximo');
+
+      const est = d.estrelas.find(e => e.casa === coord);
+      if (!est) {
+        ouvirPergunta();
+        return;
+      }
+
+      if (est.certa) {
+        resolvido = true;
+        feitas.add(idxAtual);
+        trilhaAtiva = est.trilha;
+        destinoAtivo = est.casa;
+        pecaMovida = true;
+        barra.className = 'feedback-barra acerto';
+        txt.textContent = '🎉 ' + d.sucesso;
+        btn.style.display = 'inline-block';
+        btn.textContent = idxAtual < DESAFIOS.length - 1 ? 'Próxima Fase ➔' : 'Recomeçar 🏆';
+        renderizarDesafio();
+        tocarVoz(d.num, 'acerto');
+        registrarEvento('acertou_fase', d.num);
+      } else {
+        barra.className = 'feedback-barra erro';
+        txt.textContent = '💡 Tente outra estrela! Ouça a dica!';
+        tocarVoz(d.num, 'erro');
+        registrarEvento('errou_fase', d.num);
+      }
+    }
+
+    function proximoDesafio() {
+      if (idxAtual < DESAFIOS.length - 1) {
+        irParaFase(idxAtual + 1);
+      } else {
+        irParaFase(0);
+      }
+    }
+
+    renderizarDesafio();
+    registrarEvento('abriu_site');
+  </script>
+</body>
+</html>
